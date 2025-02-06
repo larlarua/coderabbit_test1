@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{commons/commons::head}"></div>
+
+<body>
+<!-- 顶部导航栏 -->
+<div th:replace="~{commons/commons::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 侧边栏 -->
+        <div th:replace="~{commons/commons::siderbar}"></div>
+
+        <main role="main" class="col-md-10 offset-md-2 pt-3 main">
+            <hr>
+            <div class="jumbotron">
+                <h1 class="display-4">Hello Java Security</h1>
+                <p class="lead">Java Security 平台通过结合漏洞场景和安全编码，帮助安全和研发团队理解漏洞原理，从而减少漏洞的产生。</p>
+                <p class="lead"><b>未知攻，焉知防！</b></p>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="#" role="button">编码阶段</a>
+                <a class="btn btn-success btn-lg" href="#" role="button">测试阶段</a>
+                <a class="btn btn-warning btn-lg" href="#" role="button">代码审计</a>
+                <a class="btn btn-info btn-lg" href="#" role="button">安全培训</a>
+                <a class="btn btn-primary btn-lg" target="_blank" href="https://github.com/j3ers3/Hello-Java-Sec" role="button" style="float:right;">了解更多</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 引入script -->
+<div th:replace="~{commons/commons::script}"></div>
+
+
+</body>
+</html>
