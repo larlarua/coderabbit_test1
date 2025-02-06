@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{commons/commons::head}"></div>
+
+<body>
+<!-- 顶部导航栏 -->
+<div th:replace="~{commons/commons::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 侧边栏 -->
+        <div th:replace="~{commons/commons::siderbar(active='swagger.html')}"></div>
+
+        <main role="main" class="col-md-10 offset-md-2 pt-3 main">
+            <div class="card">
+                <div class="card-header py-1">
+                    <div class="vul_header">
+                        <span>Swagger未授权</span>
+                        <span class="header_link">
+                            <a class="btn btn-sm btn-primary" href="#">漏洞案例</a>
+                            <a class="btn btn-sm btn-primary" href="#">wiki</a>
+                            </span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#vulDescription">
+                                漏洞描述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#secureCoding"> 安全编码</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="vulDescription">
+                            <div class="alert alert-desc"><i class="lnr lnr-alarm"></i>
+                                Swagger是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web
+                                服务，由于未开启页面访问限制或严格的Authorize认证导致接口信息泄漏。
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="secureCoding">
+                            <div class="alert alert-desc">
+                                <li>【建议】</li>
+                                生产环境应避免将swagger接口开放到互联网上
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-float">
+                <div class="float1">
+                    <h5><span class="lnr lnr-bug"> 漏洞代码</span></h5>
+
+                    <textarea class="form-control" id="code1">
+@Configuration
+@EnableSwagger2
+public class Swagger2Config {
+
+}
+                    </textarea>
+
+                </div>
+
+                <div class="float2">
+                    <a style="float:right" class="btn btn-sm btn-success"
+                       th:href="@{/swagger-ui.html}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor"
+                             viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                        <span class="align-middle"> Run</span></a>
+                    <h5><span class="lnr lnr-smile"> 安全代码</span></h5>
+                    <textarea class="form-control" id="code2">
+@Configuration
+@EnableSwagger2
+// 设置swagger只能在dev和test环境可访问，如果开公网请一律关闭
+@Profile({"dev", "test"})
+public class Swagger2Config {
+
+}
+                    </textarea>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 引入script -->
+<div th:replace="~{commons/commons::script}"></div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{commons/commons::head}"></div>
+
+<body>
+<!-- 顶部导航栏 -->
+<div th:replace="~{commons/commons::topbar}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 侧边栏 -->
+        <div th:replace="~{commons/commons::siderbar(active='traversal.html')}"></div>
+
+        <main role="main" class="col-md-10 offset-md-2 pt-3 main">
+            <div class="card">
+                <div class="card-header py-1">
+                    <div class="vul_header">
+                        <span>文件操作 - 目录遍历</span>
+                        <span class="header_link">
+                            <a class="btn btn-sm btn-primary" href="#">漏洞案例</a>
+                            <a class="btn btn-sm btn-primary" href="#">wiki</a>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#vulDescription">
+                                漏洞描述</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#secureCoding"> 安全编码</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="vulDescription">
+                            <div class="alert alert-desc"><i class="lnr lnr-alarm"></i>
+                                目录遍历攻击（Path Traversal Attack），
+                                应用系统在处理文件时未对文件路径进行有效过滤，攻击者可以利用"../"和"./"目录跳转拼接路径，绕过安全限制，从而可下载、读取、写入或删除任意文件。
+
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="secureCoding">
+                            <div class="alert alert-desc">
+                                <li>【必须】避免路径拼接</li>
+                                1. 文件目录避免外部参数拼接。<br>
+                                2. 保存文件目录建议后台写死并对文件名进行校验（字符类型、长度）。<br>
+                                3. 建议文件保存时，将文件名替换为随机字符串。<br><br>
+                                如因业务需要不能满足上述要求，需判断请求文件名和文件路径参数中是否存在../或..\(windows)，
+                                如存在应判定路径非法并拒绝请求。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-float">
+                <div class="float1">
+                    <a style="float:right" class="btn btn-sm btn-danger" target="_blank"
+                       th:href="@{/vulnapi/Traversal/download?filename=dog.jpg}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor"
+                             viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                        <span class="align-middle"> Run</span></a>
+                    <h5><span class="lnr lnr-bug"> 漏洞代码 - 任意文件下载</span></h5>
+                    <textarea class="form-control" id="code1">
+/**
+ * 产生原因：文件路径没做限制，可通过../递归下载任意文件
+ * 如下载 filename=../../etc/passwd
+ */
+public String download(String filename, HttpServletResponse response) {
+    String filePath = System.getProperty("user.dir") + "/logs/" + filename;
+    try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(filePath)))) {
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+        response.setContentLength((int) Files.size(Paths.get(filePath)));
+        response.setContentType("application/octet-stream");
+
+        IOUtils.copy(inputStream, response.getOutputStream());
+        return "下载文件成功：" + filePath;
+    } catch (IOException e) {
+        return "未找到文件：" + filePath;
+    }
+}
+                    </textarea><br><br>
+
+                    <a style="float:right" class="btn btn-sm btn-danger" target="_blank"
+                       th:href="@{/vulnapi/Traversal/list?filename=../}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor"
+                             viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                        <span class="align-middle"> Run</span></a>
+                    <h5><span class="lnr lnr-bug"> 漏洞代码 - 任意路径遍历</span></h5>
+                    <textarea class="form-control" id="code4">
+/**
+ * 攻击者可以传入 "../../" 来访问项目目录以外的文件
+ */
+public String fileList(String filename) {
+    String filePath = System.getProperty("user.dir") + "/logs/" + filename;
+    StringBuilder sb = new StringBuilder();
+
+    File f = new File(filePath);
+    File[] fs = f.listFiles();
+
+    if (fs != null) {
+        for (File ff : fs) {
+            sb.append(ff.getName()).append("<br>");
+        }
+        return sb.toString();
+    }
+    return filePath + "目录不存在！";
+}
+                    </textarea>
+                </div>
+
+                <div class="float2">
+                    <a style="float:right" class="btn btn-sm btn-success" target="_blank"
+                       th:href="@{/vulnapi/Traversal/download/safe?filename=../}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor"
+                             viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                        <span class="align-middle"> Run</span></a>
+                    <h5><span class="lnr lnr-smile"> 安全代码 - 过滤</span></h5>
+                    <textarea class="form-control" id="code2">
+/**
+ * 通过检测路径中是否包含 '../' 或 './' 来进行基本的目录遍历防护
+ */
+public static boolean checkTraversal(String content) {
+    return content.contains("../") || content.contains("./");
+}
+                    </textarea><br><br>
+
+                    <a style="float:right" class="btn btn-sm btn-success" target="_blank"
+                       th:href="@{/vulnapi/Traversal/download/safe2?filename=../../etc/passwd}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor"
+                             viewBox="0 0 16 16">
+                            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                        </svg>
+                        <span class="align-middle"> Run</span></a>
+                    <h5><span class="lnr lnr-smile"> 安全代码 - normalize()方法</span></h5>
+                    <textarea class="form-control" id="code5">
+/**
+ * 使用normalize()方法进行路径规范化，可以将路径中的特殊字符转义
+ */
+public String safe2(String filename) {
+    String filePath = System.getProperty("user.dir") + "/logs/" + filename;
+    String filePathSafe = Paths.get(filePath).normalize().toString();
+    ...
+}
+                    </textarea><br><br>
+
+                    <a style="float:right"
+                       href="#"></a>
+                    <h5><span class="lnr lnr-smile"> 安全代码 - ID参数化</span></h5>
+                    <textarea class="form-control" id="code3">
+/**
+ * 对文件名做映射生成id值，通过参数化下载文件可以有效防止遍历问题
+ * 需要注意：控制用户权限，避免通过遍历下载文件（越权）
+ */
+public void download(@RequestParam("id") String id, HttpServletResponse response) {
+    try {
+        String fileName = fileMappingService.getFileNameById(id);
+        fileStorageService.download(id, fileName, response);
+    } catch (Exception e) {
+        log.error("下载文件失败", e);
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+}
+                    </textarea>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+<!-- 引入script -->
+<div th:replace="~{commons/commons::script}"></div>
+
+</body>
+
+</html>
